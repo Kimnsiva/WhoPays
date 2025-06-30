@@ -668,5 +668,35 @@
         generateMainTable();
         calculateSummary();
     </script>
+
+    <!-- Donate Section -->
+<div class="text-center mt-10 mb-6">
+    <div class="inline-block glass rounded-xl px-6 py-4 hover-lift">
+        <p class="text-gray-700 text-sm mb-2">
+            ☕ เลี้ยงกาแฟ Kim san, > PromptPay <span id="promptpay-number" class="font-medium text-blue-700">0933083863</span>
+        </p>
+        <button 
+            onclick="copyPromptPay()"
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-all focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        >
+            📋 Copy
+        </button>
+        <div id="copyStatus" class="mt-2 text-green-600 text-sm font-medium hidden">Copy done!</div>
+    </div>
+</div>
+
+<script>
+    function copyPromptPay() {
+        const number = document.getElementById('promptpay-number').innerText;
+        navigator.clipboard.writeText(number).then(() => {
+            const status = document.getElementById('copyStatus');
+            status.classList.remove('hidden');
+            setTimeout(() => {
+                status.classList.add('hidden');
+            }, 2000);
+        });
+    }
+</script>
+
 </body>
 </html>
