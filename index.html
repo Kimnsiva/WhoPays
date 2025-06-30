@@ -175,6 +175,28 @@
                 </div>
                 <div id="paymentSummary" class="space-y-3">
                     <!-- Payment summary will be shown here -->
+                    <!-- Payment Summary -->
+<div class="glass rounded-2xl p-6 hover-lift">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+            💳
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800">การชำระเงิน</h2>
+    </div>
+    <div id="paymentSummary" class="space-y-3">
+        <!-- Payment summary will be shown here -->
+    </div>
+    <div class="mt-4 text-right">
+        <button 
+            onclick="copySummary()" 
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        >
+            📋 Copy 
+        </button>
+        <span id="copySummaryStatus" class="ml-3 text-green-600 font-medium hidden">Copy done!</span>
+    </div>
+</div>
+
                 </div>
             </div>
         </div>
@@ -668,6 +690,30 @@
         updateItemsList();
         generateMainTable();
         calculateSummary();
+
+        function copySummary() {
+    const container = document.getElementById('paymentSummary');
+    if (!container) return;
+
+    // ดึงข้อความล้วนจาก container (ไม่เอา html tags)
+    const text = container.innerText.trim();
+
+    if (text.length === 0) {
+        alert('ไม่มีข้อมูลสรุปให้คัดลอก');
+        return;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById('copySummaryStatus');
+        status.classList.remove('hidden');
+        setTimeout(() => {
+            status.classList.add('hidden');
+        }, 2000);
+    }).catch(() => {
+        alert('คัดลอกผลสรุปไม่สำเร็จ');
+    });
+}
+
     </script>
 
     <!-- Donate Section -->
