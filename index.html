@@ -8,43 +8,38 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
+        body {
             font-family: 'Prompt', sans-serif;
         }
         
-        /* Glassmorphism Effects */
         .glass {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .glass-dark {
-            background: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .glass-white {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
-        /* Hover Effects */
+        .glass-blue {
+            background: rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .glass-red {
+            background: rgba(239, 68, 68, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
         .hover-lift {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
         
         .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
         
-        /* Custom Scrollbar */
+        /* Custom scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -55,45 +50,8 @@
         }
         
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(107, 114, 128, 0.5);
+            background: rgba(59, 130, 246, 0.3);
             border-radius: 3px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(107, 114, 128, 0.7);
-        }
-        
-        /* Gradient Background */
-        .gradient-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-        }
-        
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 0.8s ease-out;
-        }
-        
-        .animate-delay-1 {
-            animation-delay: 0.1s;
-        }
-        
-        .animate-delay-2 {
-            animation-delay: 0.2s;
-        }
-        
-        .animate-delay-3 {
-            animation-delay: 0.3s;
         }
     </style>
 </head>
@@ -101,9 +59,9 @@
     <div class="container mx-auto px-4 py-8 max-w-7xl">
         <!-- Header -->
         <div class="text-center mb-8">
-            <h3 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
                 💰 WhoPays V.2
-            </h3>
+            </h2>
             <p class="text-gray-600 font-light">An expense-sharing.<br>
 
                     > Created by [Kimnsiva](https://github.com/Kimnsiva)</p>
@@ -117,7 +75,7 @@
                     <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
                         👥
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800">จัดการสมาชิก</h3>
+                    <h2 class="text-xl font-semibold text-gray-800">จัดการสมาชิก</h2>
                 </div>
                 
                 <div class="flex gap-3 mb-4">
@@ -147,7 +105,7 @@
                     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
                         🛒
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800">เพิ่มรายการใหม่</h3>
+                    <h2 class="text-xl font-semibold text-gray-800">เพิ่มรายการใหม่</h2>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-3 mb-4">
@@ -185,7 +143,7 @@
                 <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white text-xl">
                     📊
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800">ตารางรายการ</h3>
+                <h2 class="text-xl font-semibold text-gray-800">ตารางรายการ</h2>
             </div>
             
             <div class="overflow-x-auto custom-scrollbar" id="mainTableContainer">
@@ -201,7 +159,7 @@
                     <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
                         📊
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800">สรุปค่าใช้จ่าย</h3>
+                    <h2 class="text-xl font-semibold text-gray-800">สรุปค่าใช้จ่าย</h2>
                 </div>
                 <div id="expenseSummary" class="space-y-3">
                     <!-- Expense summary will be shown here -->
@@ -214,7 +172,7 @@
                     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
                         💳
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800">การชำระเงิน</h3>
+                    <h2 class="text-xl font-semibold text-gray-800">การชำระเงิน</h2>
                 </div>
                 <div id="paymentSummary" class="space-y-3">
                     <!-- Payment summary will be shown here -->
@@ -224,7 +182,7 @@
         <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
             💳
         </div>
-        <h3 class="text-xl font-semibold text-gray-800">การชำระเงิน</h3>
+        <h2 class="text-xl font-semibold text-gray-800">การชำระเงิน</h2>
     </div>
     <div id="paymentSummary" class="space-y-3">
         <!-- Payment summary will be shown here -->
@@ -251,7 +209,7 @@
                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
                     📥
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800">ส่งออกไฟล์</h3>
+                <h2 class="text-xl font-semibold text-gray-800">ส่งออกไฟล์</h2>
             </div>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -278,7 +236,7 @@
 <div class="glass rounded-2xl p-6 mt-8">
     <div class="flex items-center gap-3 mb-4">
         <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xl">📝</div>
-        <h3 class="text-xl font-semibold text-gray-800">ประวัติการใช้งาน</h3>
+        <h2 class="text-xl font-semibold text-gray-800">ประวัติการใช้งาน</h2>
     </div>
     <div id="historyLog" class="max-h-60 overflow-y-auto custom-scrollbar text-sm space-y-2"></div>
     <div class="text-right mt-2">
@@ -289,7 +247,7 @@
 
 
     <script>
-        let friends = ['คนที่ 1']; // Default friends
+        let friends = ['คนที่ 1', 'คนที่ 2']; // Default friends
         let items = [];
         let expenses = {}; // { itemIndex: { payer: friendIndex, participants: [friendIndex1, friendIndex2, ...] } }
 
@@ -532,89 +490,123 @@
             updatePaymentSummary(individualExpenses, individualPaid);
         }
 
-        function updatePaymentSummary(individualExpenses, individualPaid) {
-    const container = document.getElementById('paymentSummary');
-    const balances = friends.map((friend, index) => ({
-        name: friend,
-        balance: +(individualPaid[index] - individualExpenses[index]).toFixed(2),
-        index: index
-    }));
-
-    const creditors = balances.filter(p => p.balance > 0.01).map(p => ({ ...p }));
-    const debtors = balances.filter(p => p.balance < -0.01).map(p => ({ ...p, balance: Math.abs(p.balance) }));
-
-    let html = '';
-
-    balances.forEach(person => {
-        const isPositive = person.balance > 0.01;
-        const isNegative = person.balance < -0.01;
-        const balanceText = isPositive
-            ? `ได้รับคืน ${person.balance.toFixed(2)} บาท`
-            : isNegative
-            ? `ต้องจ่าย ${person.balance.toFixed(2)} บาท`
-            : `เท่ากัน`;
-
-        const balanceClass = isPositive
-            ? 'border-l-4 border-green-500 bg-green-50'
-            : isNegative
-            ? 'border-l-4 border-red-500 bg-red-50'
-            : 'border-l-4 border-gray-300 bg-gray-50';
-
-        html += `
-            <div class="glass rounded-xl p-4 hover-lift ${balanceClass}">
-                <div class="flex justify-between items-center">
-                    <span class="font-semibold text-gray-800">${person.name}</span>
-                    <span class="font-medium ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'}">${balanceText}</span>
+        function updateExpenseSummary(individualExpenses, individualPaid) {
+            const container = document.getElementById('expenseSummary');
+            const totalExpense = individualExpenses.reduce((sum, exp) => sum + exp, 0);
+            
+            let html = friends.map((friend, index) => `
+                <div class="glass-blue rounded-xl p-4 hover-lift">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold text-gray-800">${friend}</span>
+                        <div class="text-right text-sm">
+                            <div class="text-orange-600 font-medium">ค่าใช้จ่าย: ${individualExpenses[index].toFixed(2)} บาท</div>
+                            <div class="text-green-600 font-medium">จ่ายไป: ${individualPaid[index].toFixed(2)} บาท</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        `;
-    });
-
-    const settlements = [];
-    while (creditors.length && debtors.length) {
-        const creditor = creditors[0];
-        const debtor = debtors[0];
-        const amount = Math.min(creditor.balance, debtor.balance);
-
-        settlements.push({
-            from: debtor.name,
-            to: creditor.name,
-            amount: amount
-        });
-
-        creditor.balance -= amount;
-        debtor.balance -= amount;
-
-        if (creditor.balance <= 0.01) creditors.shift();
-        if (debtor.balance <= 0.01) debtors.shift();
-    }
-
-    if (settlements.length > 0) {
-        html += `
-            <div class="mt-6 mb-4">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-lg font-semibold text-gray-800">💸 การชำระเงิน:</span>
-                </div>
-            </div>
-        `;
-        settlements.forEach(settlement => {
+            `).join('');
+            
             html += `
-                <div class="glass-blue rounded-xl p-4 hover-lift border-l-4 border-yellow-500 bg-yellow-50">
-                    <div class="text-center">
-                        <span class="font-semibold text-gray-800">${settlement.from}</span>
-                        <span class="mx-2 text-gray-600">จ่ายให้</span>
-                        <span class="font-semibold text-gray-800">${settlement.to}</span>
-                        <div class="text-lg font-bold text-orange-600 mt-1">${settlement.amount.toFixed(2)} บาท</div>
+                <div class="glass rounded-xl p-4 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-gray-800">รวมทั้งหมด</span>
+                        <span class="text-xl font-bold text-blue-600">${totalExpense.toFixed(2)} บาท</span>
                     </div>
                 </div>
             `;
-        });
-    }
+            
+            container.innerHTML = html;
+        }
 
-    container.innerHTML = html;
-}
+        function updatePaymentSummary(individualExpenses, individualPaid) {
+            const container = document.getElementById('paymentSummary');
+            const balances = friends.map((friend, index) => ({
+                name: friend,
+                balance: individualPaid[index] - individualExpenses[index],
+                index: index
+            }));
 
+            // Sort by balance (creditors first, then debtors)
+            balances.sort((a, b) => b.balance - a.balance);
 
+            let html = '';
+            
+            // Show individual balances
+            balances.forEach(person => {
+                const isPositive = person.balance > 0.01;
+                const isNegative = person.balance < -0.01;
+                const balanceClass = isPositive ? 'border-l-4 border-green-500 bg-green-50' : 
+                                  isNegative ? 'border-l-4 border-red-500 bg-red-50' : 
+                                  'border-l-4 border-gray-300 bg-gray-50';
+                
+                const balanceText = isPositive ? 
+                    `ได้รับคืน ${Math.abs(person.balance).toFixed(2)} บาท` :
+                    isNegative ? 
+                    `ต้องจ่าย ${Math.abs(person.balance).toFixed(2)} บาท` :
+                    `เท่ากัน`;
+                
+                html += `
+                    <div class="glass rounded-xl p-4 hover-lift ${balanceClass}">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-800">${person.name}</span>
+                            <span class="font-medium ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'}">${balanceText}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Calculate optimal settlements
+            const settlements = calculateSettlements(balances);
+            if (settlements.length > 0) {
+                html += `
+                    <div class="mt-6 mb-4">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-lg font-semibold text-gray-800">💸 การชำระเงิน:</span>
+                        </div>
+                    </div>
+                `;
+                settlements.forEach(settlement => {
+                    html += `
+                        <div class="glass-blue rounded-xl p-4 hover-lift border-l-4 border-yellow-500 bg-yellow-50">
+                            <div class="text-center">
+                                <span class="font-semibold text-gray-800">${settlement.from}</span>
+                                <span class="mx-2 text-gray-600">จ่ายให้</span>
+                                <span class="font-semibold text-gray-800">${settlement.to}</span>
+                                <div class="text-lg font-bold text-orange-600 mt-1">${settlement.amount.toFixed(2)} บาท</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function calculateSettlements(balances) {
+            const settlements = [];
+            const creditors = balances.filter(p => p.balance > 0.01).map(p => ({...p}));
+            const debtors = balances.filter(p => p.balance < -0.01).map(p => ({...p, balance: Math.abs(p.balance)}));
+
+            while (creditors.length > 0 && debtors.length > 0) {
+                const creditor = creditors[0];
+                const debtor = debtors[0];
+                const amount = Math.min(creditor.balance, debtor.balance);
+
+                settlements.push({
+                    from: debtor.name,
+                    to: creditor.name,
+                    amount: amount
+                });
+
+                creditor.balance -= amount;
+                debtor.balance -= amount;
+
+                if (creditor.balance < 0.01) creditors.shift();
+                if (debtor.balance < 0.01) debtors.shift();
+            }
+
+            return settlements;
+        }
 
         function exportToExcel() {
             if (items.length === 0) {
