@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhoPays V.2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-blue {
+            background: rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .glass-red {
+            background: rgba(239, 68, 68, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+                💰 WhoPays V.2
+            </h2>
+            <p class="text-gray-600 font-light">An expense-sharing.<br>
+
+                    > Created by [Kimnsiva](https://github.com/Kimnsiva)</p>
+        </div>
+        
+        <!-- Setup Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Friends Management -->
+            <div class="glass rounded-2xl p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
+                        👥
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">จัดการสมาชิก</h2>
+                </div>
+                
+                <div class="flex gap-3 mb-4">
+                    <input 
+                        type="text" 
+                        id="friendName" 
+                        placeholder="ชื่อเพื่อน" 
+                        class="flex-1 px-4 py-3 rounded-xl border-0 glass-blue focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all text-gray-700 placeholder-gray-500"
+                    >
+                    <button 
+                        class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                        onclick="addFriend()"
+                    >
+                        เพิ่ม
+                    </button>
+                </div>
+                
+                <div class="max-h-40 overflow-y-auto custom-scrollbar" id="friendsList">
+                    <!-- Friends will be added here -->
+                </div>
+            </div>
+            
+
+            <!-- Items Management -->
+            <div class="glass rounded-2xl p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                        🛒
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">เพิ่มรายการใหม่</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mb-4">
+
+                    <input 
+                        type="text" 
+                        id="itemName" 
+                        placeholder="ชื่อรายการ" 
+                        class="flex-1 px-4 py-3 rounded-xl border-0 glass-blue focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all text-gray-700 placeholder-gray-500"
+                    >
+                    <input 
+                        type="number" 
+                        id="itemPrice" 
+                        placeholder="ราคา" 
+                        step="0.01" 
+                        class="w-28 px-4 py-3 rounded-xl border-0 glass-blue focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all text-gray-700 placeholder-gray-500"
+                    >
+                    <button 
+                        class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-green-400 focus:outline-none"
+                        onclick="addItem()"
+                    >
+                        เพิ่ม
+                    </button>
+                </div>
+                
+                <div class="max-h-40 overflow-y-auto custom-scrollbar" id="itemsList">
+                    <!-- Items preview will be shown here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Table -->
+        <div class="glass rounded-2xl p-6 mb-8 overflow-hidden hover-lift">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white text-xl">
+                    📊
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ตารางรายการ</h2>
+            </div>
+            
+            <div class="overflow-x-auto custom-scrollbar" id="mainTableContainer">
+                <!-- Main table will be generated here -->
+            </div>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+            <!-- Expense Summary -->
+            <div class="glass rounded-2xl p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+                        📊
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">สรุปค่าใช้จ่าย</h2>
+                </div>
+                <div id="expenseSummary" class="space-y-3">
+                    <!-- Expense summary will be shown here -->
+                </div>
+            </div>
+            
+            <!-- Payment Summary -->
+            <div class="glass rounded-2xl p-6 hover-lift">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                        💳
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">การชำระเงิน</h2>
+                </div>
+                <div id="paymentSummary" class="space-y-3">
+                    <!-- Payment summary will be shown here -->
+                    <!-- Payment Summary -->
+<div class="glass rounded-2xl p-6 hover-lift">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+            💳
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800">การชำระเงิน</h2>
+    </div>
+    <div id="paymentSummary" class="space-y-3">
+        <!-- Payment summary will be shown here -->
+    </div>
+    <div class="mt-4 text-right">
+        <button 
+            onclick="copySummary()" 
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        >
+            📋 Copy 
+        </button>
+        <span id="copySummaryStatus" class="ml-3 text-green-600 font-medium hidden">Copy done!</span>
+    </div>
+</div>
+
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Export Section -->
+        <div class="glass rounded-2xl p-6 text-center hover-lift">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
+                    📥
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800">ส่งออกไฟล์</h2>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button 
+                    class="px-8 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-green-400 focus:outline-none flex items-center gap-2"
+                    onclick="exportToExcel()"
+                >
+                    📄 ดาวน์โหลด Excel
+                </button>
+                <button 
+                    class="px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-all hover-lift focus:ring-2 focus:ring-red-400 focus:outline-none flex items-center gap-2"
+                    onclick="resetAll()"
+                >
+                    🔄 รีเซ็ททั้งหมด
+                </button>
+            </div>
+            
+            <div id="status" class="mt-4"></div>
+        </div>
+    </div>
+<!-- ✅ เพิ่มส่วนแสดงประวัติการใช้งานใน WhoPays -->
+
+<!-- ใส่หลังส่วน Export Section หรือส่วนไหนก็ได้ตามต้องการ -->
+<div class="glass rounded-2xl p-6 mt-8">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xl">📝</div>
+        <h2 class="text-xl font-semibold text-gray-800">ประวัติการใช้งาน</h2>
+    </div>
+    <div id="historyLog" class="max-h-60 overflow-y-auto custom-scrollbar text-sm space-y-2"></div>
+    <div class="text-right mt-2">
+        <button onclick="clearHistory()" class="text-sm text-red-600 hover:underline">🗑️ ล้างประวัติ</button>
+    </div>
+</div>
+
+
+
+    <script>
+        let friends = ['คนที่ 1', 'คนที่ 2']; // Default friends
+        let items = [];
+        let expenses = {}; // { itemIndex: { payer: friendIndex, participants: [friendIndex1, friendIndex2, ...] } }
+
+        function addFriend() {
+    const nameInput = document.getElementById('friendName');
+    const name = nameInput.value.trim();
+    if (name && !friends.includes(name)) {
+        friends.push(name);
+        nameInput.value = '';
+        updateFriendsList();
+        generateMainTable();
+        calculateSummary();
+        logHistory(`👤 เพิ่มเพื่อนใหม่: <strong>${name}</strong>`);
+    }
+}
+
+
+        function removeFriend(index) {
+            if (friends.length > 1) {
+                friends.splice(index, 1);
+                // Clean up expenses data
+                Object.keys(expenses).forEach(itemIndex => {
+                    if (expenses[itemIndex].payer === index) {
+                        expenses[itemIndex].payer = 0;
+                    } else if (expenses[itemIndex].payer > index) {
+                        expenses[itemIndex].payer--;
+                    }
+                    expenses[itemIndex].participants = expenses[itemIndex].participants
+                        .filter(p => p !== index)
+                        .map(p => p > index ? p - 1 : p);
+                });
+                updateFriendsList();
+                generateMainTable();
+                calculateSummary();
+            }
+        }
+
+        function updateFriendsList() {
+            const container = document.getElementById('friendsList');
+            container.innerHTML = friends.map((friend, index) => `
+                <div class="flex items-center justify-between p-3 glass-blue rounded-xl mb-2 hover-lift">
+                    <span class="text-gray-700 font-medium">${friend}</span>
+                    ${friends.length > 1 ? `
+                        <button 
+                            class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all focus:ring-2 focus:ring-red-400 focus:outline-none"
+                            onclick="removeFriend(${index})"
+                        >
+                            ลบ
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function addItem() {
+    const nameInput = document.getElementById('itemName');
+    const priceInput = document.getElementById('itemPrice');
+    const name = nameInput.value.trim();
+    const price = parseFloat(priceInput.value);
+    
+    if (name && !isNaN(price) && price > 0) {
+        const itemIndex = items.length;
+        items.push({ name, price });
+        expenses[itemIndex] = { payer: 0, participants: [] };
+        
+        nameInput.value = '';
+        priceInput.value = '';
+        updateItemsList();
+        generateMainTable();
+        calculateSummary();
+        logHistory(`🛒 เพิ่มรายการ: <strong>${name}</strong> ราคา <strong>${price.toFixed(2)}</strong> บาท`);
+    }
+}
+
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            delete expenses[index];
+            
+            // Reindex expenses
+            const newExpenses = {};
+            Object.keys(expenses).forEach(key => {
+                const numKey = parseInt(key);
+                if (numKey > index) {
+                    newExpenses[numKey - 1] = expenses[key];
+                } else if (numKey < index) {
+                    newExpenses[numKey] = expenses[key];
+                }
+            });
+            expenses = newExpenses;
+            
+            updateItemsList();
+            generateMainTable();
+            calculateSummary();
+        }
+
+        function updateItemsList() {
+            const container = document.getElementById('itemsList');
+            container.innerHTML = items.map((item, index) => `
+                <div class="flex items-center justify-between p-3 glass-blue rounded-xl mb-2 hover-lift">
+                    <span class="text-gray-700 font-medium">${item.name} - ${item.price.toFixed(2)} บาท</span>
+                    <button 
+                        class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-all focus:ring-2 focus:ring-red-400 focus:outline-none"
+                        onclick="removeItem(${index})"
+                    >
+                        ลบ
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function generateMainTable() {
+            const container = document.getElementById('mainTableContainer');
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <div class="text-6xl mb-4">🛒</div>
+                        <p class="text-lg">กรุณาเพิ่มรายการก่อน</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const friendHeaders = friends.map(friend => 
+                `<th class="px-2 py-3 text-center text-xs font-semibold text-gray-700 bg-blue-50 border-b border-gray-200 min-w-[50px]">
+                    <div class="truncate">${friend}</div>
+                </th>`
+            ).join('');
+            
+            const rows = items.map((item, itemIndex) => {
+                const checkboxes = friends.map((friend, friendIndex) => {
+                    const checked = expenses[itemIndex]?.participants.includes(friendIndex) ? 'checked' : '';
+                    return `
+                        <td class="px-2 py-3 text-center border-b border-gray-200 bg-green-50">
+                            <input 
+                                type="checkbox" 
+                                ${checked} 
+                                onchange="updateParticipant(${itemIndex}, ${friendIndex}, this.checked)"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            >
+                        </td>
+                    `;
+                }).join('');
+
+                const payerOptions = friends.map((friend, friendIndex) => 
+                    `<option value="${friendIndex}" ${expenses[itemIndex]?.payer === friendIndex ? 'selected' : ''}>${friend}</option>`
+                ).join('');
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-3 py-3 text-center text-sm font-medium text-gray-600 border-b border-gray-200 bg-gray-50 w-12">
+                            ${itemIndex + 1}
+                        </td>
+                        <td class="px-4 py-3 text-left text-sm text-gray-800 border-b border-gray-200 max-w-[200px]">
+                            <div class="truncate font-medium">${item.name}</div>
+                        </td>
+                        <td class="px-2 py-3 text-right text-sm font-semibold text-orange-600 border-b border-gray-200 bg-orange-50 w-20">
+                            ${item.price.toFixed(0)}
+                        </td>
+                        <td class="px-2 py-3 border-b border-gray-200 bg-blue-50 w-24">
+                            <select 
+                                onchange="updatePayer(${itemIndex}, this.value)"
+                                class="w-full px-1 py-1 text-xs bg-transparent border-0 focus:ring-1 focus:ring-blue-400 focus:outline-none text-gray-700"
+                            >
+                                ${payerOptions}
+                            </select>
+                        </td>
+                        ${checkboxes}
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                            <th class="px-3 py-4 text-center text-xs font-semibold text-gray-700 border-b-2 border-gray-200 w-12">
+                                No.
+                            </th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-gray-700 border-b-2 border-gray-200">
+                                รายการ
+                            </th>
+                            <th class="px-2 py-4 text-center text-xs font-semibold text-gray-700 border-b-2 border-gray-200 w-20">
+                                ราคา
+                            </th>
+                            <th class="px-2 py-4 text-center text-xs font-semibold text-gray-700 border-b-2 border-gray-200 w-24">
+                                คนจ่าย
+                            </th>
+                            ${friendHeaders}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updatePayer(itemIndex, payerIndex) {
+            expenses[itemIndex].payer = parseInt(payerIndex);
+            calculateSummary();
+        }
+
+        function updateParticipant(itemIndex, friendIndex, checked) {
+            if (!expenses[itemIndex].participants) {
+                expenses[itemIndex].participants = [];
+            }
+            
+            if (checked) {
+                if (!expenses[itemIndex].participants.includes(friendIndex)) {
+                    expenses[itemIndex].participants.push(friendIndex);
+                }
+            } else {
+                expenses[itemIndex].participants = expenses[itemIndex].participants.filter(p => p !== friendIndex);
+            }
+            calculateSummary();
+        }
+
+        function calculateSummary() {
+            // Calculate individual expenses
+            const individualExpenses = friends.map(() => 0);
+            const individualPaid = friends.map(() => 0);
+            
+            items.forEach((item, itemIndex) => {
+                const expense = expenses[itemIndex];
+                if (expense && expense.participants.length > 0) {
+                    const costPerPerson = item.price / expense.participants.length;
+                    
+                    // Add to each participant's expense
+                    expense.participants.forEach(participantIndex => {
+                        individualExpenses[participantIndex] += costPerPerson;
+                    });
+                    
+                    // Add to payer's paid amount
+                    individualPaid[expense.payer] += item.price;
+                }
+            });
+
+            updateExpenseSummary(individualExpenses, individualPaid);
+            updatePaymentSummary(individualExpenses, individualPaid);
+        }
+
+        function updateExpenseSummary(individualExpenses, individualPaid) {
+            const container = document.getElementById('expenseSummary');
+            const totalExpense = individualExpenses.reduce((sum, exp) => sum + exp, 0);
+            
+            let html = friends.map((friend, index) => `
+                <div class="glass-blue rounded-xl p-4 hover-lift">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold text-gray-800">${friend}</span>
+                        <div class="text-right text-sm">
+                            <div class="text-orange-600 font-medium">ค่าใช้จ่าย: ${individualExpenses[index].toFixed(2)} บาท</div>
+                            <div class="text-green-600 font-medium">จ่ายไป: ${individualPaid[index].toFixed(2)} บาท</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            html += `
+                <div class="glass rounded-xl p-4 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-gray-800">รวมทั้งหมด</span>
+                        <span class="text-xl font-bold text-blue-600">${totalExpense.toFixed(2)} บาท</span>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function updatePaymentSummary(individualExpenses, individualPaid) {
+            const container = document.getElementById('paymentSummary');
+            const balances = friends.map((friend, index) => ({
+                name: friend,
+                balance: individualPaid[index] - individualExpenses[index],
+                index: index
+            }));
+
+            // Sort by balance (creditors first, then debtors)
+            balances.sort((a, b) => b.balance - a.balance);
+
+            let html = '';
+            
+            // Show individual balances
+            balances.forEach(person => {
+                const isPositive = person.balance > 0.01;
+                const isNegative = person.balance < -0.01;
+                const balanceClass = isPositive ? 'border-l-4 border-green-500 bg-green-50' : 
+                                  isNegative ? 'border-l-4 border-red-500 bg-red-50' : 
+                                  'border-l-4 border-gray-300 bg-gray-50';
+                
+                const balanceText = isPositive ? 
+                    `ได้รับคืน ${Math.abs(person.balance).toFixed(2)} บาท` :
+                    isNegative ? 
+                    `ต้องจ่าย ${Math.abs(person.balance).toFixed(2)} บาท` :
+                    `เท่ากัน`;
+                
+                html += `
+                    <div class="glass rounded-xl p-4 hover-lift ${balanceClass}">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-gray-800">${person.name}</span>
+                            <span class="font-medium ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'}">${balanceText}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Calculate optimal settlements
+            const settlements = calculateSettlements(balances);
+            if (settlements.length > 0) {
+                html += `
+                    <div class="mt-6 mb-4">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-lg font-semibold text-gray-800">💸 การชำระเงิน:</span>
+                        </div>
+                    </div>
+                `;
+                settlements.forEach(settlement => {
+                    html += `
+                        <div class="glass-blue rounded-xl p-4 hover-lift border-l-4 border-yellow-500 bg-yellow-50">
+                            <div class="text-center">
+                                <span class="font-semibold text-gray-800">${settlement.from}</span>
+                                <span class="mx-2 text-gray-600">จ่ายให้</span>
+                                <span class="font-semibold text-gray-800">${settlement.to}</span>
+                                <div class="text-lg font-bold text-orange-600 mt-1">${settlement.amount.toFixed(2)} บาท</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function calculateSettlements(balances) {
+            const settlements = [];
+            const creditors = balances.filter(p => p.balance > 0.01).map(p => ({...p}));
+            const debtors = balances.filter(p => p.balance < -0.01).map(p => ({...p, balance: Math.abs(p.balance)}));
+
+            while (creditors.length > 0 && debtors.length > 0) {
+                const creditor = creditors[0];
+                const debtor = debtors[0];
+                const amount = Math.min(creditor.balance, debtor.balance);
+
+                settlements.push({
+                    from: debtor.name,
+                    to: creditor.name,
+                    amount: amount
+                });
+
+                creditor.balance -= amount;
+                debtor.balance -= amount;
+
+                if (creditor.balance < 0.01) creditors.shift();
+                if (debtor.balance < 0.01) debtors.shift();
+            }
+
+            return settlements;
+        }
+
+        function exportToExcel() {
+            if (items.length === 0) {
+                showStatus('กรุณาเพิ่มรายการก่อนส่งออก', 'error');
+                return;
+            }
+
+            try {
+                const headers = ['No.', 'รายการ', 'ราคา (บาท)', 'คนจ่าย', ...friends];
+                const data = [headers];
+
+                items.forEach((item, itemIndex) => {
+                    const expense = expenses[itemIndex];
+                    const participantColumns = friends.map((friend, friendIndex) => 
+                        expense?.participants.includes(friendIndex) ? '✓' : ''
+                    );
+
+                    data.push([
+                        itemIndex + 1,
+                        item.name,
+                        item.price,
+                        friends[expense?.payer || 0],
+                        ...participantColumns
+                    ]);
+                });
+
+                // Add summary section
+                data.push([]);
+                data.push(['สรุปการชำระเงิน']);
+                
+                const individualExpenses = friends.map(() => 0);
+                const individualPaid = friends.map(() => 0);
+                
+                items.forEach((item, itemIndex) => {
+                    const expense = expenses[itemIndex];
+                    if (expense && expense.participants.length > 0) {
+                        const costPerPerson = item.price / expense.participants.length;
+                        expense.participants.forEach(participantIndex => {
+                            individualExpenses[participantIndex] += costPerPerson;
+                        });
+                        individualPaid[expense.payer] += item.price;
+                    }
+                });
+
+                friends.forEach((friend, index) => {
+                    const balance = individualPaid[index] - individualExpenses[index];
+                    data.push([
+                        friend,
+                        `ค่าใช้จ่าย: ${individualExpenses[index].toFixed(2)}`,
+                        `จ่ายไป: ${individualPaid[index].toFixed(2)}`,
+                        `คงเหลือ: ${balance.toFixed(2)}`
+                    ]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'แชร์ค่าใช้จ่าย');
+                
+                const fileName = `แชร์ค่าใช้จ่าย_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                showStatus('ดาวน์โหลดไฟล์ Excel เรียบร้อยแล้ว!', 'success');
+            } catch (error) {
+                showStatus('เกิดข้อผิดพลาดในการส่งออกไฟล์: ' + error.message, 'error');
+            }
+        }
+
+        function resetAll() {
+            if (confirm('ต้องการรีเซ็ทข้อมูลทั้งหมดหรือไม่?')) {
+                friends = ['คนที่ 1', 'คนที่ 2'];
+                items = [];
+                expenses = {};
+                
+                updateFriendsList();
+                updateItemsList();
+                generateMainTable();
+                calculateSummary();
+                
+                showStatus('รีเซ็ทข้อมูลเรียบร้อยแล้ว!', 'success');
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            const bgColor = type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700';
+            const icon = type === 'success' ? '✅' : '❌';
+            
+            status.innerHTML = `
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-l-4 ${bgColor} font-medium">
+                    <span>${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                status.innerHTML = '';
+            }, 3000);
+        }
+function logHistory(text) {
+    const container = document.getElementById('historyLog');
+    const time = new Date().toLocaleTimeString('th-TH', { hour12: false });
+    const entry = `<span class="text-blue-500">[${time}]</span> ${text}`;
+
+    // แสดงบนหน้า
+    const div = document.createElement('div');
+    div.innerHTML = entry;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+
+    // เก็บใน localStorage
+    let logs = JSON.parse(localStorage.getItem('historyLog') || '[]');
+    logs.push(entry);
+    localStorage.setItem('historyLog', JSON.stringify(logs));
+}
+
+// Initialize
+updateFriendsList();
+updateItemsList();
+generateMainTable();
+calculateSummary();
+loadHistory(); // ← อย่าลืมเพิ่มบรรทัดนี้เพื่อโหลด log ตอนเริ่ม
+
+
+        function copySummary() {
+    const container = document.getElementById('paymentSummary');
+    if (!container) return;
+
+    // ดึงข้อความล้วนจาก container (ไม่เอา html tags)
+    const text = container.innerText.trim();
+
+    if (text.length === 0) {
+        alert('ไม่มีข้อมูลสรุปให้คัดลอก');
+        return;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById('copySummaryStatus');
+        status.classList.remove('hidden');
+        setTimeout(() => {
+            status.classList.add('hidden');
+        }, 2000);
+    }).catch(() => {
+        alert('คัดลอกผลสรุปไม่สำเร็จ');
+    });
+}
+
+    </script>
+
+    <!-- Donate Section -->
+<div class="text-center mt-10 mb-6">
+    <div class="inline-block glass rounded-xl px-6 py-4 hover-lift">
+        <p class="text-gray-700 text-sm mb-2">
+            ☕ เลี้ยงกาแฟ Kim san, > PromptPay <span id="promptpay-number" class="font-medium text-blue-700">0933083863</span>
+        </p>
+        <button 
+            onclick="copyPromptPay()"
+            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-all focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        >
+            📋 Copy
+        </button>
+        <div id="copyStatus" class="mt-2 text-green-600 text-sm font-medium hidden">Copy done!</div>
+    </div>
+</div>
+
+<script>
+    function copyPromptPay() {
+        const number = document.getElementById('promptpay-number').innerText;
+        navigator.clipboard.writeText(number).then(() => {
+            const status = document.getElementById('copyStatus');
+            status.classList.remove('hidden');
+            setTimeout(() => {
+                status.classList.add('hidden');
+            }, 2000);
+        });
+    }
+    // กด Enter เพื่อเพิ่มเพื่อน
+document.getElementById('friendName').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') addFriend();
+});
+
+// กด Enter เพื่อเพิ่มรายการเมื่ออยู่ใน itemName หรือ itemPrice
+['itemName', 'itemPrice'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') addItem();
+    });
+});
+
+</script>
+
+</body>
+</html>
+
+<!-- ✅ ส่วนแสดงประวัติการใช้งานใน WhoPays (เวอร์ชันแก้ไขตามคำแนะนำ) -->
+
+
+<script>
+function logHistory(text) {
+    const container = document.getElementById('historyLog');
+    const time = new Date().toLocaleString('th-TH', { hour12: false });
+    const entry = `<span class="text-blue-500">[${time}]</span> ${text}`;
+
+    const div = document.createElement('div');
+    div.innerHTML = entry;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+
+    let logs = JSON.parse(localStorage.getItem('historyLog') || '[]');
+    logs.push(entry);
+    localStorage.setItem('historyLog', JSON.stringify(logs));
+}
+
+function loadHistory() {
+    const container = document.getElementById('historyLog');
+    const logs = JSON.parse(localStorage.getItem('historyLog') || '[]');
+    logs.forEach(entry => {
+        const div = document.createElement('div');
+        div.innerHTML = entry;
+        container.appendChild(div);
+    });
+    container.scrollTop = container.scrollHeight;
+}
+
+function clearHistory() {
+    if (confirm('ต้องการล้างประวัติหรือไม่?')) {
+        localStorage.removeItem('historyLog');
+        document.getElementById('historyLog').innerHTML = '';
+    }
+}
+</script>
+
+<script>
+updateFriendsList();
+updateItemsList();
+generateMainTable();
+calculateSummary();
+loadHistory();
+</script>
