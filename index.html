@@ -532,113 +532,88 @@
             updatePaymentSummary(individualExpenses, individualPaid);
         }
 
-        function updateExpenseSummary(individualExpenses, individualPaid) {
-            const container = document.getElementById('expenseSummary');
-            const totalExpense = individualExpenses.reduce((sum, exp) => sum + exp, 0);
-            
-            let html = friends.map((friend, index) => `
-                <div class="glass-blue rounded-xl p-4 hover-lift">
-                    <div class="flex justify-between items-center">
-                        <span class="font-semibold text-gray-800">${friend}</span>
-                        <div class="text-right text-sm">
-                            <div class="text-orange-600 font-medium">ค่าใช้จ่าย: ${individualExpenses[index].toFixed(2)} บาท</div>
-                            <div class="text-green-600 font-medium">จ่ายไป: ${individualPaid[index].toFixed(2)} บาท</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            html += `
-                <div class="glass rounded-xl p-4 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
-                    <div class="flex justify-between items-center">
-                        <span class="text-lg font-bold text-gray-800">รวมทั้งหมด</span>
-                        <span class="text-xl font-bold text-blue-600">${totalExpense.toFixed(2)} บาท</span>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
-
         function updatePaymentSummary(individualExpenses, individualPaid) {
-            const container = document.getElementById('paymentSummary');
-            const balances = friends.map((friend, index) => ({
-                name: friend,
-                balance: individualPaid[index] - individualExpenses[index],
-                index: index
-            }));
+    const container = document.getElementById('paymentSummary');
+    const balances = friends.map((friend, index) => ({
+        name: friend,
+        balance: +(individualPaid[index] - individualExpenses[index]).toFixed(2),
+        index: index
+    }));
 
-            // Sort by balance (creditors first, then debtors)
-            balances.sort((a, b) => b.balance - a.balance);
-
-            let html = '';
-            
-            // Show individual balances
-            balances.forEach(person => {
-                const isPositive = person.balance > 0.01;
-                const isNegative = person.balance < -0.01;
-                const balanceClass = isPositive ? 'border-l-4 border-green-500 bg-green-50' : 
-                                  isNegative ? 'border-l-4 border-red-500 bg-red-50' : 
-                                  'border-l-4 border-gray-300 bg-gray-50';
-                
-                const balanceText = isPositive ? 
-                    `ได้รับคืน ${Math.abs(person.balance).toFixed(2)} บาท` :
-                    isNegative ? 
-                    `ต้องจ่าย ${Math.abs(person.balance).toFixed(2)} บาท` :
-                    `เท่ากัน`;
-                
-                html += `
-                    <div class="glass rounded-xl p-4 hover-lift ${balanceClass}">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-gray-800">${person.name}</span>
-                            <span class="font-medium ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'}">${balanceText}</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            function calculateSettlements(balances) {
-    const settlements = [];
     const creditors = balances.filter(p => p.balance > 0.01).map(p => ({ ...p }));
     const debtors = balances.filter(p => p.balance < -0.01).map(p => ({ ...p, balance: Math.abs(p.balance) }));
 
-    while (creditors.length > 0 && debtors.length > 0) {
-        let maxAmount = 0;
-        let maxCreditorIndex = -1;
-        let maxDebtorIndex = -1;
+    let html = '';
 
-        // หาคู่ creditor-debtor ที่สามารถจ่ายได้มากที่สุด
-        for (let i = 0; i < creditors.length; i++) {
-            for (let j = 0; j < debtors.length; j++) {
-                const amount = Math.min(creditors[i].balance, debtors[j].balance);
-                if (amount > maxAmount) {
-                    maxAmount = amount;
-                    maxCreditorIndex = i;
-                    maxDebtorIndex = j;
-                }
-            }
-        }
+    balances.forEach(person => {
+        const isPositive = person.balance > 0.01;
+        const isNegative = person.balance < -0.01;
+        const balanceText = isPositive
+            ? `ได้รับคืน ${person.balance.toFixed(2)} บาท`
+            : isNegative
+            ? `ต้องจ่าย ${person.balance.toFixed(2)} บาท`
+            : `เท่ากัน`;
 
-        if (maxAmount === 0) break;
+        const balanceClass = isPositive
+            ? 'border-l-4 border-green-500 bg-green-50'
+            : isNegative
+            ? 'border-l-4 border-red-500 bg-red-50'
+            : 'border-l-4 border-gray-300 bg-gray-50';
 
-        const creditor = creditors[maxCreditorIndex];
-        const debtor = debtors[maxDebtorIndex];
+        html += `
+            <div class="glass rounded-xl p-4 hover-lift ${balanceClass}">
+                <div class="flex justify-between items-center">
+                    <span class="font-semibold text-gray-800">${person.name}</span>
+                    <span class="font-medium ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'}">${balanceText}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    const settlements = [];
+    while (creditors.length && debtors.length) {
+        const creditor = creditors[0];
+        const debtor = debtors[0];
+        const amount = Math.min(creditor.balance, debtor.balance);
 
         settlements.push({
             from: debtor.name,
             to: creditor.name,
-            amount: maxAmount
+            amount: amount
         });
 
-        creditor.balance -= maxAmount;
-        debtor.balance -= maxAmount;
+        creditor.balance -= amount;
+        debtor.balance -= amount;
 
-        if (creditor.balance < 0.01) creditors.splice(maxCreditorIndex, 1);
-        if (debtor.balance < 0.01) debtors.splice(maxDebtorIndex, 1);
+        if (creditor.balance <= 0.01) creditors.shift();
+        if (debtor.balance <= 0.01) debtors.shift();
     }
 
-    return settlements;
+    if (settlements.length > 0) {
+        html += `
+            <div class="mt-6 mb-4">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-lg font-semibold text-gray-800">💸 การชำระเงิน:</span>
+                </div>
+            </div>
+        `;
+        settlements.forEach(settlement => {
+            html += `
+                <div class="glass-blue rounded-xl p-4 hover-lift border-l-4 border-yellow-500 bg-yellow-50">
+                    <div class="text-center">
+                        <span class="font-semibold text-gray-800">${settlement.from}</span>
+                        <span class="mx-2 text-gray-600">จ่ายให้</span>
+                        <span class="font-semibold text-gray-800">${settlement.to}</span>
+                        <div class="text-lg font-bold text-orange-600 mt-1">${settlement.amount.toFixed(2)} บาท</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    container.innerHTML = html;
 }
+
 
 
         function exportToExcel() {
